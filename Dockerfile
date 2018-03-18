@@ -1,8 +1,14 @@
-# can use an alternative base image as well
+# can use an alternative base image as well, like look into Alpine Linux
+# for smaller image
 FROM phusion/baseimage:0.9.19
+# references:
+# https://github.com/nodejs/docker-node/blob/master/8/alpine/Dockerfile
+# https://github.com/docker-library/redis/tree/master/4.0/alpine
+# https://pkgs.alpinelinux.org/package/edge/main/x86/mutt
+# https://github.com/nginxinc/docker-nginx/blob/master/stable/alpine/Dockerfile
 
 # set your node version, if desired
-RUN curl -sL https://deb.nodesource.com/setup_4.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get install -y nodejs
 
 # install other dependencies
@@ -30,16 +36,22 @@ RUN cp /opt/redis-stable/src/redis-server /usr/local/bin/
 RUN cp /opt/redis-stable/src/redis-cli /usr/local/bin/
 RUN update-rc.d redis_6379 defaults
 # now should be able to start redis with: /etc/init.d/redis_6379 start
+
 # install mutt locally, and install it silently/non-interactively
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get install -y mutt
+# workaround to deal with this error when sending text over the textbelt server
+# postdrop: warning: unable to look up public/pickup: No such file or directory
+RUN mkfifo /var/spool/postfix/public/pickup
+
 # install a local nginx for reverse proxy / load balancing, or IP rate limiting?
 #RUN apt-get update
 #RUN apt-get install -y nginx
 # any nginx customizations & running as service setup go here...
 # TODO: to enable accurate IP rate limiting, the reverse proxy should be configured to set the `X-Real-IP` header
-# install screen - in case want to start services manually in background and switch between them as windows via screen
-RUN apt-get install -y screen
+
+# install screen, tmux - in case want to start services manually in background and switch between them as windows via screen/tmux
+RUN apt-get install -y screen tmux
 
 # Create app directory
 RUN mkdir -p /opt/textbelt/
