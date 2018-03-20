@@ -67,9 +67,10 @@ RUN npm install
 # Bundle app source
 COPY . /opt/textbelt/
 
-# (any) textbelt customizations (to save in docker image)
-RUN sed -i -- "s|fromAddress = 'foo@bar.com'|fromAddress = 'me@mydomain.com'|g" /opt/textbelt/lib/text.js
-#RUN rm /opt/textbelt/lib/text.js--
+# (any) textbelt customizations (to save in docker image), like sender address
+RUN sed -i -- "s|fromAddress:  'foo@bar.com',|fromAddress:  'me@mydomain.com',|g" /opt/textbelt/lib/config.js;
+#RUN rm /opt/textbelt/lib/config.js--
+
 RUN touch /opt/textbelt/server/torlist
 RUN echo "node /opt/textbelt/server/app.js &" >> /etc/rc.local
 
