@@ -36,6 +36,7 @@ RUN cp /opt/redis-stable/src/redis-server /usr/local/bin/
 RUN cp /opt/redis-stable/src/redis-cli /usr/local/bin/
 RUN update-rc.d redis_6379 defaults
 # now should be able to start redis with: /etc/init.d/redis_6379 start
+RUN echo "/etc/init.d/redis_6379 start" >> /etc/rc.local
 
 # install mutt locally, and install it silently/non-interactively
 ENV DEBIAN_FRONTEND noninteractive
@@ -69,6 +70,8 @@ COPY . /opt/textbelt/
 # (any) textbelt customizations (to save in docker image)
 RUN sed -i -- "s|fromAddress = 'foo@bar.com'|fromAddress = 'me@mydomain.com'|g" /opt/textbelt/lib/text.js
 #RUN rm /opt/textbelt/lib/text.js--
+RUN touch /opt/textbelt/server/torlist
+RUN echo "node /opt/textbelt/server/app.js &" >> /etc/rc.local
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
